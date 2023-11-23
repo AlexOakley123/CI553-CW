@@ -59,6 +59,11 @@ public class StockRW extends StockR implements StockReadWriter
     return updates > 0;   // sucess ?
   }
 
+
+
+
+
+
   /**
    * Adds stock (Re-stocks) to the store.
    *  Assumed to exist in database.
@@ -73,6 +78,23 @@ public class StockRW extends StockR implements StockReadWriter
       getStatementObject().executeUpdate(
         "update StockTable set stockLevel = stockLevel + " + amount +
         "         where productNo = '" + pNum + "'"
+      );
+      //getConnectionObject().commit();
+      DEBUG.trace( "DB StockRW: addStock(%s,%d)" , pNum, amount );
+    } catch ( SQLException e )
+    {
+      throw new StockException( "SQL addStock: " + e.getMessage() );
+    }
+  }
+
+  public synchronized void addInteraction( String pNum, int amount )
+          throws StockException
+  {
+    try
+    {
+      getStatementObject().executeUpdate(
+              "update ProductTable set Interaction = Interaction + " + amount +
+                      "         where productNo = '" + pNum + "'"
       );
       //getConnectionObject().commit();
       DEBUG.trace( "DB StockRW: addStock(%s,%d)" , pNum, amount );

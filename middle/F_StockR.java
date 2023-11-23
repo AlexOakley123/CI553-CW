@@ -105,4 +105,9 @@ public class F_StockR implements StockReader
     }
   }
 
+  @Override
+  public Integer Interaction(String pNum) throws StockException {
+    return null;
+  }
+
 }

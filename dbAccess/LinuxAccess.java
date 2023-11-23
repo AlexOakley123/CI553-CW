@@ -16,6 +16,6 @@ class LinuxAccess extends DBAccess
   public String urlOfDatabase()
   {
     //return "jdbc:mysql://localhost/cshop?user=root";
-    return "jdbc:mysql://ao657_Catshop:PASSWORD@ao657.brighton.domains/ao657_Catshop";
+    return "jdbc:mysql://ao657_Catshop:Matcet4p@ao657.brighton.domains/ao657_Catshop";
   }
 }

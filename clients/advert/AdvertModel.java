@@ -5,7 +5,9 @@ import debug.DEBUG;
 import middle.MiddleFactory;
 import middle.*;
 import clients.advert.AdvertView;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import debug.DEBUG;
 import middle.MiddleFactory;
@@ -30,6 +32,12 @@ public class AdvertModel extends Observable {
     private String pn = "0001"; // Initial value for pn
     private OrderProcessing theOrder = null;
     private StockReadWriter theStock = null;
+
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    private long InteractionBasedTime;
+
+
 
     public AdvertModel(MiddleFactory mf) {
         try {
@@ -61,34 +69,28 @@ public class AdvertModel extends Observable {
     }
 
     public void runAdverts() {
-        // Schedule a task to switch images and update text every 5 seconds
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // Update pn to switch between 0001 and 0009
-                pn = getNextPn(pn);
+        // Schedule a task to switch images and update text
+        scheduler.schedule(() -> runTask(), 0, TimeUnit.SECONDS);
+    }
 
-                // Get details and update theAction
-                Product product = null;
-                try {
-                    product = theStock.getDetails(pn);
-                } catch (StockException e) {
-                    throw new RuntimeException(e);
-                }
-                if (product.getQuantity() >= 1) { // Check if product is in stock
-                    theAction = String.format("%s : %7.2f (%2d)",
-                            product.getDescription(),
-                            product.getPrice(),
-                            product.getQuantity());
-                } else {
-                    theAction = "Product not in stock";
-                }
+    private void runTask() {
+        // Update pn to switch between 0001 and 0009
+        pn = getNextPn(pn);
+        long InteractionBasedTime = 0;
 
-                setChanged();
-                notifyObservers(theAction);
-            }
-        }, 0, 5000); // Start immediately and repeat every 5 seconds
+        try {
+            InteractionBasedTime = (1000 + (theStock.Interaction(pn)) * 1000);
+        } catch (StockException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Delay: " + InteractionBasedTime);
+
+        setChanged();
+        notifyObservers(theAction);
+
+        // Reschedule the task with the new InteractionBasedTime
+        scheduler.schedule(() -> runTask(), InteractionBasedTime, TimeUnit.MILLISECONDS);
     }
 
     private String getNextPn(String currentPn) {

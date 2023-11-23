@@ -114,4 +114,9 @@ public class F_StockRW extends F_StockR
     }
   }
 
+  @Override
+  public void addInteraction(String pNum, int Amount) throws StockException {
+
+  }
+
 }

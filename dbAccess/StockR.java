@@ -172,4 +172,22 @@ public class StockR implements StockReader
     return new ImageIcon( filename );
   }
 
+  public synchronized Integer Interaction(String pNum) {
+    int InteractionsTotal = 0;
+    try {
+      ResultSet rs   = getStatementObject().executeQuery(
+              "select Interaction from ProductTable " +
+                      "  where  ProductTable.productNo = '" + pNum + "'"
+      );
+      boolean res = rs.next();
+      if ( res )
+        InteractionsTotal = rs.getInt( "Interaction" );
+      rs.close();
+      return(InteractionsTotal);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
 }

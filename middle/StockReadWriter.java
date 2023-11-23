@@ -36,4 +36,6 @@ public interface StockReadWriter extends StockReader
    */
   void modifyStock(Product detail) throws StockException;
 
+  void addInteraction(String pNum, int Amount)throws StockException;
+
 }

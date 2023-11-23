@@ -80,6 +80,8 @@ public class CustomerModel extends Observable
           theBasket.add( pr );                  //   Add to basket
           thePic = theStock.getImage( pn );     //    product
           CheckClicked = true;
+          theStock.addInteraction(pn, 1);
+          System.out.println(theStock.Interaction(pn));
         } else {                                //  F
           theAction =                           //   Inform
             pr.getDescription() +               //    product not
