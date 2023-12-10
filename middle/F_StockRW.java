@@ -119,4 +119,9 @@ public class F_StockRW extends F_StockR
 
   }
 
+  @Override
+  public void addRating(String pNum, int Rating) throws StockException {
+
+  }
+
 }

@@ -110,4 +110,9 @@ public class F_StockR implements StockReader
     return null;
   }
 
+  @Override
+  public Float getRating(String pNum) throws StockException {
+    return null;
+  }
+
 }
