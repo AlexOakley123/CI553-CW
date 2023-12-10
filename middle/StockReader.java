@@ -41,4 +41,6 @@ public interface StockReader
   ImageIcon getImage(String pNum) throws StockException;
 
   Integer Interaction(String pNum) throws StockException;
+
+ Float getRating(String pNum) throws StockException;
 }

@@ -12,6 +12,7 @@ import debug.DEBUG;
 import middle.StockException;
 import middle.StockReadWriter;
 
+import java.lang.invoke.StringConcatException;
 import java.sql.SQLException;
 
 // There can only be 1 ResultSet opened per statement
@@ -99,6 +100,23 @@ public class StockRW extends StockR implements StockReadWriter
       //getConnectionObject().commit();
       DEBUG.trace( "DB StockRW: addStock(%s,%d)" , pNum, amount );
     } catch ( SQLException e )
+    {
+      throw new StockException( "SQL addStock: " + e.getMessage() );
+    }
+  }
+
+  public synchronized void addRating( String pNum, int Rating)throws StockException{
+    try {
+      getStatementObject().executeUpdate(
+              "update ProductTable set TotalStars = TotalStars + " + Rating +
+                      "         where productNo = '" + pNum + "'"
+      );                     //Increase TotalStars by Rating where ProductNo = pNum
+      getStatementObject().executeUpdate(
+              "update ProductTable set NumOfRatings = NumOfRatings + " + 1 +
+                      "         where productNo = '" + pNum + "'"
+      );                     //Increase NumOfRatings by 1 where ProductNo = pNum
+
+    }catch ( SQLException e )
     {
       throw new StockException( "SQL addStock: " + e.getMessage() );
     }

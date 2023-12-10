@@ -189,5 +189,24 @@ public class StockR implements StockReader
     }
 
   }
-
+  public synchronized Float getRating(String pNum) {
+    float Rating = 0;
+    float NumOfRatings = 0;
+    int NumOfStars = 0;
+    try {
+      ResultSet rs   = getStatementObject().executeQuery(
+              "select numOfRatings, TotalStars from ProductTable " +
+                      "  where  ProductTable.productNo = '" + pNum + "'"
+      );            //Select required fields and put them into a result set
+      boolean res = rs.next();
+      if ( res )
+        NumOfRatings = rs.getFloat( "numOfRatings" );
+        NumOfStars = rs.getInt( "TotalStars" );
+        rs.close();
+        Rating = NumOfStars / NumOfRatings;    //Divide NumOfStars by NumOfRatings
+        return(Rating);                        //to get average stars and return.
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }
