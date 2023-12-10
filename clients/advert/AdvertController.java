@@ -21,6 +21,8 @@ public class AdvertController
         this.model = model;
     }
 
+
+
     /**
      * Collect interaction from view
      * @param orderNum The order collected

@@ -4,20 +4,18 @@ import catalogue.Product;
 import debug.DEBUG;
 import middle.MiddleFactory;
 import middle.*;
-import clients.advert.AdvertView;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import debug.DEBUG;
-import middle.MiddleFactory;
 import middle.OrderProcessing;
 
 import javax.swing.*;
 import java.util.Observable;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.awt.Image;
+import java.text.DecimalFormat;
+
 
 
 /**
@@ -28,14 +26,25 @@ import java.awt.Image;
 
 public class AdvertModel extends Observable {
     private String theAction = "";
-    private String theOutput = "";
+
     private String pn = "0001"; // Initial value for pn
+
     private OrderProcessing theOrder = null;
     private StockReadWriter theStock = null;
 
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
-    private long InteractionBasedTime;
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private AdvertView  view  = null;
+    private  String messageDisplayedPrice = "";
+    private String messageDisplayedRating = "";
+    private String messageDisplayedFinal = "";
+    private String pn2 = "";
+
+
+
+
+
 
 
 
@@ -56,6 +65,8 @@ public class AdvertModel extends Observable {
             ImageIcon originalIcon = theStock.getImage(pn);
             Image originalImage = originalIcon.getImage();
 
+
+
             // Scale the image to fit the dimensions of thePicture
             Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
@@ -68,6 +79,7 @@ public class AdvertModel extends Observable {
         }
     }
 
+
     public void runAdverts() {
         // Schedule a task to switch images and update text
         scheduler.schedule(() -> runTask(), 0, TimeUnit.SECONDS);
@@ -76,6 +88,9 @@ public class AdvertModel extends Observable {
     private void runTask() {
         // Update pn to switch between 0001 and 0009
         pn = getNextPn(pn);
+
+
+
         long InteractionBasedTime = 0;
 
         try {
@@ -86,6 +101,9 @@ public class AdvertModel extends Observable {
 
         System.out.println("Delay: " + InteractionBasedTime);
 
+
+
+
         setChanged();
         notifyObservers(theAction);
 
@@ -95,10 +113,57 @@ public class AdvertModel extends Observable {
 
     private String getNextPn(String currentPn) {
         int currentNumber = Integer.parseInt(currentPn);
-        int nextNumber = (currentNumber % 9) + 1; // Loop back to 1 after 9
+        int nextNumber = (currentNumber < 7) ? currentNumber + 1 : 1;
+
         return String.format("%04d", nextNumber);
     }
 
+    public String updateText(){
+        try {
+            Product pr = theStock.getDetails( pn );
 
+            if (Float.isNaN(theStock.getRating(pn)) == true){
+                messageDisplayedRating = "No Ratings";
+
+
+
+            }else{
+                messageDisplayedRating = (df.format((theStock.getRating( pn ))) + " Stars");
+
+
+            }
+            //messageDisplayedRating = (String.valueOf(theStock.getRating(pn) + " Stars!"));
+            messageDisplayedPrice = String.valueOf(pr.getPrice());
+
+
+
+            messageDisplayedFinal = ("ONLY £" + messageDisplayedPrice + "       " + messageDisplayedRating);
+
+
+
+
+        } catch (StockException e) {
+            throw new RuntimeException(e);
+        }
+        return(messageDisplayedFinal);
+
+    }
+
+    public String HotOrNot() {
+
+
+        try {
+            if( theStock.Interaction(pn) >= 5 ){
+                return("HOT ITEM!");
+            }
+            else{
+                return("");
+            }
+
+
+        } catch (StockException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
