@@ -7,6 +7,8 @@ import clients.cashier.CashierView;
 import debug.DEBUG;
 import middle.*;
 
+import java.text.DecimalFormat;
+
 import javax.swing.*;
 import java.util.Observable;
 
@@ -22,6 +24,11 @@ public class CustomerModel extends Observable
   private Boolean CheckClicked = false;
 
   private String      pn = "";                    // Product being processed
+
+  private String RatingDisplayed = "";
+
+  private static final DecimalFormat df = new DecimalFormat("0.00");
+
 
 
   private StockReadWriter theStock     = null;
@@ -69,13 +76,21 @@ public class CustomerModel extends Observable
       if ( theStock.exists( pn ) )              // Stock Exists?
       {                                         // T
         Product pr = theStock.getDetails( pn ); //  Product
+
+        if (Float.isNaN(theStock.getRating(pn)) == true){ //Check if has any ratings
+          RatingDisplayed = "No Ratings for this Item";
+        }else{
+          RatingDisplayed = (df.format((theStock.getRating( pn ))) + " Stars");
+        }//If so, turn the rating into a string and pass it to theAction
+
         if ( pr.getQuantity() >= amount )       //  In stock?
         { 
           theAction =                           //   Display 
-            String.format( "%s : %7.2f (%2d) ", //
+            String.format( "%s : %7.2f (%2d) %s ", //
               pr.getDescription(),              //    description
               pr.getPrice(),                    //    price
-              pr.getQuantity() );               //    quantity
+              pr.getQuantity(),                //    quantity
+                    RatingDisplayed );
           pr.setQuantity( amount );             //   Require 1
           theBasket.add( pr );                  //   Add to basket
           thePic = theStock.getImage( pn );     //    product
@@ -179,12 +194,24 @@ public class CustomerModel extends Observable
       if (theStock.exists(inputField)) //check the input has a matching stock
       {
         doCheck(inputField);     //do the check on the item number
+        CustomerView.setSliderAndButtonVisibility(true);
       }
       else{
         doClear();         //else clear the stage
+        CustomerView.setSliderAndButtonVisibility(false);
       }
     } catch (StockException e) {
       DEBUG.error("CustomerClient.doCheck()\n%s",
+              e.getMessage());
+    }
+  }
+
+  public void Review(String pn, int Rating){
+    try {
+      theStock.addRating(pn, Rating);
+      CustomerView.setSliderAndButtonVisibility(false);
+    }catch(StockException e ){
+      DEBUG.error("CustomerClient.doReview()\n%s",
               e.getMessage());
     }
   }

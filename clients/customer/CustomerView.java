@@ -25,7 +25,7 @@ public class CustomerView implements Observer
     public static final String CLEAR  = "Clear";
   }
 
-  private static final int H = 350;       // Height of window pixels
+  private static final int H = 450;       // Height of window pixels
   private static final int W = 400;       // Width  of window pixels
 
   private final JLabel      theAction  = new JLabel();
@@ -36,6 +36,13 @@ public class CustomerView implements Observer
   private final JButton     theBtClear = new JButton( Name.CLEAR );
 
   private final JButton theBtReserve = new JButton("Reserve Item");
+
+  private static final JSlider theSlider = new JSlider(JSlider.HORIZONTAL, 1, 5, 3);
+  //Slider to take in user rating
+  private static final JButton getValueButton = new JButton("Submit review");
+  //Submit button to grab slider value
+  private static final JLabel  leaveAReview  = new JLabel();
+  //Text area to instruct user.
 
 
   private Picture thePicture = new Picture(80,80);
@@ -104,6 +111,28 @@ public class CustomerView implements Observer
     thePicture.setBounds( 16, 25+60*2, 80, 80 );   // Picture area
     cp.add( thePicture );                           //  Add to canvas
     thePicture.clear();
+
+
+    theSlider.setBounds(16, 25 + 60 * 5, 200, 40); //Add  slider
+    theSlider.setMajorTickSpacing(1);
+    theSlider.setPaintTicks(true);
+    theSlider.setPaintLabels(true);
+    cp.add(theSlider);
+    theSlider.setVisible(false);
+
+    getValueButton.setBounds(240, 25 + 60 * 5, 150, 40);
+    getValueButton.addActionListener(e -> {
+      int sliderValue = theSlider.getValue();
+      cont.Review(theInput.getText(), theSlider.getValue());
+      JOptionPane.showMessageDialog(null, "You left a rating of " + sliderValue + " For this product");
+    });
+    cp.add(getValueButton);
+    getValueButton.setVisible(false);
+
+    leaveAReview.setBounds( 150, 300, 350, 30 );
+    leaveAReview.setText( "Leave a review of this product?" );
+    cp.add( leaveAReview );
+    leaveAReview.setVisible(false);
     
     rootWindow.setVisible( true );                  // Make visible);
     theInput.requestFocus();                        // Focus is here
@@ -139,6 +168,12 @@ public class CustomerView implements Observer
     }
     theOutput.setText( model.getBasket().getDetails() );
     theInput.requestFocus();               // Focus is here
+  }
+
+  public static void setSliderAndButtonVisibility(boolean isVisible) {
+    theSlider.setVisible(isVisible);
+    getValueButton.setVisible(isVisible);
+    leaveAReview.setVisible(isVisible);
   }
 
 }

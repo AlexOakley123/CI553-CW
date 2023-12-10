@@ -46,4 +46,8 @@ public class CustomerController {
   public void doChange(String textInput){
     model.textChange(textInput);
   }
+
+  public void Review(String pn, int Rating){
+    model.Review(pn, Rating);
+  }
 }
